@@ -1,4 +1,5 @@
 from django.db import models
+from padam_django.apps.geography.models import Place
 
 
 class Driver(models.Model):
@@ -43,3 +44,14 @@ class BusShift(models.Model):
     def __str__(self):
         return f"BusShift (Bus: {self.bus}, Driver: {self.driver})"
 
+class BusStop(models.Model):
+    place = models.ForeignKey(Place, on_delete=models.CASCADE, related_name='bus_stops')
+    bus_shift = models.ForeignKey('BusShift', on_delete=models.CASCADE, related_name='bus_stops', null=True)
+    stop_order = models.PositiveIntegerField("Order of the stop in the bus route")
+
+    class Meta:
+        unique_together = (("bus_shift", "stop_order"),)
+        ordering = ['stop_order']
+
+    def __str__(self):
+        return f"BusStop: {self.place.name} (Order: {self.stop_order})"
